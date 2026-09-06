@@ -57,13 +57,25 @@ jobs:
           haxelib install newgrounds
           haxelib install flixel-tools
 
+      - name: Patch Flixel Android input
+        run: |
+          FLIXEL_DIR="$HOME/haxelib/flixel/4,10,0"
+          FILE="$FLIXEL_DIR/flixel/input/actions/FlxAction.hx"
+
+          echo "Patching:"
+          echo "$FILE"
+
+          grep -q "FlxActionInputDigital.FlxActionInputDigitalAndroid" "$FILE" || \
+          sed -i '/FlxActionInputDigitalMouseWheel;/a #if android\nimport flixel.input.actions.FlxActionInputDigital.FlxActionInputDigitalAndroid;\n#end' "$FILE"
+
+          grep -n "FlxActionInputDigitalAndroid" "$FILE"
+
       - name: Setup Lime
         run: |
           haxelib run lime setup
 
       - name: Configure Lime Android
         run: |
-          mkdir -p "$HOME/.lime"
           printf '%s\n' \
             "$ANDROID_SDK_ROOT" \
             "$ANDROID_SDK_ROOT/ndk/21.4.7075529" \
