@@ -25,7 +25,7 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Setup Android SDK
+      - name: Setup Android
         uses: android-actions/setup-android@v3
 
       - name: Install Android tools
@@ -49,13 +49,12 @@ jobs:
           haxelib install hscript
           haxelib install newgrounds
           haxelib install flixel-tools
-
           haxelib git flixel-addons https://github.com/HaxeFlixel/flixel-addons.git
 
       - name: Setup Lime Android
-  run: |
-    export ANDROID_HOME=$ANDROID_SDK_ROOT
-    yes | haxelib run lime setup android
+        run: |
+          export ANDROID_HOME=$ANDROID_SDK_ROOT
+          yes | haxelib run lime setup android
 
       - name: Build APK
         run: |
@@ -70,5 +69,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Forever-Engine-Android
-          path: |
-            export/**/*.apk
+          path: export/**/*.apk
