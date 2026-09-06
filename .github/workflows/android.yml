@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build FFBB Android APK
 
 on:
   push:
@@ -14,74 +14,81 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Java
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Setup Haxe
+      - name: Setup Haxe 4.1.5
         uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.1.5
 
-      - name: Check environment
+      - name: Check versions
         run: |
           echo "Java:"
           java -version
           echo "Haxe:"
           haxe --version
-          echo "Haxelib:"
-          haxelib --version
 
       - name: Setup Android
         uses: android-actions/setup-android@v3
 
-      - name: Install Android SDK
+      - name: Install Android SDK and NDK
         run: |
           sdkmanager "platform-tools"
           sdkmanager "platforms;android-29"
           sdkmanager "build-tools;29.0.3"
           sdkmanager "ndk;21.4.7075529"
 
+      - name: Configure Android environment
+        run: |
+          echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/21.4.7075529" >> "$GITHUB_ENV"
+
       - name: Setup Haxelib
         run: |
           mkdir -p "$HOME/haxelib"
           haxelib setup "$HOME/haxelib"
 
-      - name: Install project dependencies
+      - name: Install project libraries
         run: |
-          haxelib install lime
+          haxelib install lime 7.8.0
           haxelib install openfl
-          haxelib install flixel
+          haxelib install flixel 4.8.1
           haxelib install flixel-addons
           haxelib install flixel-ui
           haxelib install hscript
           haxelib install newgrounds
           haxelib install flixel-tools
-          haxelib install hxcpp
 
-      - name: Configure Android environment
+      - name: Install Polymod
         run: |
-          export ANDROID_HOME="$ANDROID_SDK_ROOT"
-          export ANDROID_SDK="$ANDROID_SDK_ROOT"
-          export ANDROID_NDK_ROOT="$ANDROID_SDK_ROOT/ndk/21.4.7075529"
-          export JAVA_HOME="$JAVA_HOME_17_X64"
-
-          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
-          echo "ANDROID_SDK=$ANDROID_SDK" >> "$GITHUB_ENV"
-          echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT" >> "$GITHUB_ENV"
-          echo "JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          haxelib git polymod https://github.com/larsiusprime/polymod.git
 
       - name: Configure Lime
         run: |
-          haxelib run lime setup android
+          haxelib run lime setup
 
-      - name: Build Android
+      - name: Create APIStuff
+        run: |
+          cat > source/APIStuff.hx <<'EOF'
+          package;
+
+          class APIStuff
+          {
+              public static var API:String = "";
+              public static var EncKey:String = "";
+          }
+          EOF
+
+      - name: Build Android APK
         run: |
           haxelib run lime build android -release
 
-      - name: Show APK
+      - name: Find APK
         run: |
           find export -type f -name "*.apk" -print
 
