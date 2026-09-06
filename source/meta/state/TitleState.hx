@@ -26,7 +26,7 @@ import gameObjects.userInterface.SpatulaHUD;
 import lime.app.Application;
 import meta.MusicBeat.MusicBeatState;
 import meta.data.;
-import meta.data.dependency.Discord;
+import meta.data.dependency.Discord.changePresence(...)
 import meta.state.menus.;
 import meta.subState.GameOverSubstate;
 import openfl.Assets;
