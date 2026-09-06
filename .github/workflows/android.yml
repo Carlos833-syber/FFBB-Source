@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Java 17
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -25,15 +25,19 @@ jobs:
         with:
           haxe-version: 4.1.5
 
-      - name: Check Java
+      - name: Check environment
         run: |
-          echo "JAVA_HOME=$JAVA_HOME"
+          echo "Java:"
           java -version
+          echo "Haxe:"
+          haxe --version
+          echo "Haxelib:"
+          haxelib --version
 
       - name: Setup Android
         uses: android-actions/setup-android@v3
 
-      - name: Install Android tools
+      - name: Install Android SDK
         run: |
           sdkmanager "platform-tools"
           sdkmanager "platforms;android-29"
@@ -45,40 +49,45 @@ jobs:
           mkdir -p "$HOME/haxelib"
           haxelib setup "$HOME/haxelib"
 
-      - name: Install dependencies
+      - name: Install project dependencies
         run: |
-          haxelib install hxcpp
-          haxelib install lime 7.8.0
-          haxelib install openfl 8.9.7
-          haxelib install flixel 4.8.1
-          haxelib install flixel-addons 2.8.0
-          haxelib install flixel-ui 2.4.0
+          haxelib install lime
+          haxelib install openfl
+          haxelib install flixel
+          haxelib install flixel-addons
+          haxelib install flixel-ui
           haxelib install hscript
           haxelib install newgrounds
           haxelib install flixel-tools
+          haxelib install hxcpp
 
-      - name: Setup Lime Android
+      - name: Configure Android environment
         run: |
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
-          export ANDROID_SDK=$ANDROID_SDK_ROOT
-          export ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/21.4.7075529
-          export JAVA_HOME=$JAVA_HOME_17_X64
+          export ANDROID_HOME="$ANDROID_SDK_ROOT"
+          export ANDROID_SDK="$ANDROID_SDK_ROOT"
+          export ANDROID_NDK_ROOT="$ANDROID_SDK_ROOT/ndk/21.4.7075529"
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK=$ANDROID_SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT" >> "$GITHUB_ENV"
+          echo "JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+
+      - name: Configure Lime
+        run: |
           haxelib run lime setup android
 
-      - name: Build APK
+      - name: Build Android
         run: |
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
-          export ANDROID_SDK=$ANDROID_SDK_ROOT
-          export ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/21.4.7075529
-          export JAVA_HOME=$JAVA_HOME_17_X64
           haxelib run lime build android -release
 
-      - name: Find APK
+      - name: Show APK
         run: |
           find export -type f -name "*.apk" -print
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Forever-Engine-Android
+          name: FFBB-Source-Android
           path: export/**/*.apk
+          if-no-files-found: error
