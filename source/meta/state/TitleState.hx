@@ -3,36 +3,24 @@ package meta.state;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.addons.display.FlxGridOverlay;
-import flixel.addons.transition.FlxTransitionSprite.GraphicTransTileDiamond;
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.addons.transition.TransitionData;
 import flixel.effects.particles.FlxEmitter;
-import flixel.graphics.FlxGraphic;
-import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup;
 import flixel.input.gamepad.FlxGamepad;
 import flixel.math.FlxMath;
-import flixel.math.FlxPoint;
-import flixel.math.FlxRect;
-import flixel.system.FlxSound;
-import flixel.system.ui.FlxSoundTray;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import gameObjects.userInterface.SpatulaHUD;
-import lime.app.Application;
 import meta.MusicBeat.MusicBeatState;
-import meta.data.;
-import meta.data.dependency.Discord.changePresence(...)
-import meta.state.menus.;
+import meta.data.*;
+import meta.state.menus.*;
 import meta.subState.GameOverSubstate;
 import openfl.Assets;
 
 using StringTools;
-
 class TitleState extends MusicBeatState
 {
 static var initialized:Bool = false;
