@@ -156,12 +156,14 @@ class TitleState extends MusicBeatState
 			12,
 			false
 		);
+
 		island.animation.add(
 			'loopReverse',
 			[6, 5, 4, 3, 2, 1],
 			12,
 			false
 		);
+
 		island.animation.add(
 			'transition',
 			[7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
@@ -212,6 +214,7 @@ class TitleState extends MusicBeatState
 			1284,
 			724
 		);
+
 		bubbles.animation.add(
 			'rise',
 			[
@@ -221,6 +224,7 @@ class TitleState extends MusicBeatState
 			30,
 			false
 		);
+
 		bubbles.screenCenter();
 		bubbles.visible = false;
 		bubbles.antialiasing = true;
@@ -281,9 +285,7 @@ class TitleState extends MusicBeatState
 			bubbleRise.lifespan.set(3, 5);
 
 			bubbleRise.loadParticles(
-				Paths.image(
-					'particles/BubbleHit' + i
-				),
+				Paths.image('particles/BubbleHit' + i),
 				500,
 				16,
 				true
@@ -302,10 +304,9 @@ class TitleState extends MusicBeatState
 		add(particles);
 
 		logoBl = new FlxSprite().loadGraphic(
-			Paths.image(
-				'menus/base/titleandmainmenu/icon'
-			)
+			Paths.image('menus/base/titleandmainmenu/icon')
 		);
+
 		logoBl.antialiasing = true;
 		logoBl.scrollFactor.set();
 		logoBl.screenCenter(Y);
@@ -330,10 +331,12 @@ class TitleState extends MusicBeatState
 
 		enterText.scrollFactor.set();
 		enterText.y += 650;
+
 		enterText.x =
 			logoBl.getGraphicMidpoint().x -
 			(enterText.width -
 			(enterText.width / 2));
+
 		enterText.antialiasing = true;
 		enterText.visible = false;
 		add(enterText);
@@ -360,6 +363,7 @@ class TitleState extends MusicBeatState
 
 			menuItem.animation.frameIndex = i;
 			menuItem.ID = i;
+
 			menuItems.add(menuItem);
 
 			menuItem.scrollFactor.set();
@@ -403,9 +407,7 @@ class TitleState extends MusicBeatState
 		);
 
 		transitionBG.setGraphicSize(
-			Std.int(
-				transitionBG.width * 2
-			)
+			Std.int(transitionBG.width * 2)
 		);
 
 		transitionBG.visible = false;
@@ -417,6 +419,7 @@ class TitleState extends MusicBeatState
 
 		bubbleEffect =
 			new FlxTypedGroup<FlxSprite>();
+
 		add(bubbleEffect);
 
 		for (i in 0...40)
@@ -504,10 +507,15 @@ class TitleState extends MusicBeatState
 	override function update(elapsed:Float):Void
 	{
 		if (FlxG.sound.music != null)
+		{
 			Conductor.songPosition =
 				FlxG.sound.music.time;
+		}
 
-		// Proteção contra Null Object Reference.
+		/*
+			Proteção contra Null Object Reference
+			no Android.
+		*/
 		if (
 			island != null &&
 			island.animation != null &&
@@ -527,15 +535,19 @@ class TitleState extends MusicBeatState
 					reverseAnim = !reverseAnim;
 
 					if (reverseAnim)
+					{
 						island.animation.play(
 							'loopReverse',
 							true
 						);
+					}
 					else
+					{
 						island.animation.play(
 							'loop',
 							true
 						);
+					}
 				}
 			}
 			else
@@ -945,13 +957,17 @@ class TitleState extends MusicBeatState
 					}
 
 					if (curSelected < 0)
+					{
 						curSelected =
 							optionShit.length - 1;
+					}
 					else if (
 						curSelected >=
 						optionShit.length
 					)
+					{
 						curSelected = 0;
+					}
 				}
 			}
 		}
@@ -1001,10 +1017,12 @@ class TitleState extends MusicBeatState
 		if (danceLeft)
 		{
 			if (spongeDance != null)
+			{
 				spongeDance.animation.play(
 					'danceRight',
 					true
 				);
+			}
 
 			if (menuBFGF != null)
 				menuBFGF.animation.play('dance');
@@ -1012,10 +1030,12 @@ class TitleState extends MusicBeatState
 		else
 		{
 			if (spongeDance != null)
+			{
 				spongeDance.animation.play(
 					'danceLeft',
 					true
 				);
+			}
 
 			if (menuBFGF != null)
 				menuBFGF.animation.play('dance');
@@ -1029,6 +1049,7 @@ class TitleState extends MusicBeatState
 			{
 				case 2:
 					if (heavy != null)
+					{
 						FlxTween.tween(
 							heavy,
 							{alpha: 1},
@@ -1038,9 +1059,11 @@ class TitleState extends MusicBeatState
 									FlxEase.sineOut
 							}
 						);
+					}
 
 				case 4:
 					if (heavy != null)
+					{
 						FlxTween.tween(
 							heavy,
 							{alpha: 0},
@@ -1050,9 +1073,11 @@ class TitleState extends MusicBeatState
 									FlxEase.sineOut
 							}
 						);
+					}
 
 				case 6:
 					if (foreverText != null)
+					{
 						FlxTween.tween(
 							foreverText,
 							{alpha: 1},
@@ -1062,9 +1087,11 @@ class TitleState extends MusicBeatState
 									FlxEase.sineOut
 							}
 						);
+					}
 
 				case 8:
 					if (foreverText != null)
+					{
 						FlxTween.tween(
 							foreverText,
 							{alpha: 0},
@@ -1074,9 +1101,11 @@ class TitleState extends MusicBeatState
 									FlxEase.sineOut
 							}
 						);
+					}
 
 				case 10:
 					if (tribute != null)
+					{
 						FlxTween.tween(
 							tribute,
 							{alpha: 1},
@@ -1086,9 +1115,11 @@ class TitleState extends MusicBeatState
 									FlxEase.sineOut
 							}
 						);
+					}
 
 				case 12:
 					if (tribute != null)
+					{
 						FlxTween.tween(
 							tribute,
 							{alpha: 0},
@@ -1098,6 +1129,7 @@ class TitleState extends MusicBeatState
 									FlxEase.sineOut
 							}
 						);
+					}
 
 				case 14:
 					if (island != null)
@@ -1142,13 +1174,13 @@ class TitleState extends MusicBeatState
 		if (!skippedIntro)
 		{
 			skippedIntro = true;
-
 			FlxG.save.data.skipable = true;
 
 			if (
 				!Init.trueSettings.get(
 					'Disable Flashing Lights'
 				)
+			)
 			{
 				FlxG.camera.flash(
 					FlxColor.WHITE,
@@ -1229,7 +1261,7 @@ class TitleState extends MusicBeatState
 
 	function mainMenuSwitch():Void
 	{
-		// Discord desativado no Android.
+		// Discord removido para compatibilidade com Android.
 
 		if (logoBl == null)
 			return;
@@ -1335,7 +1367,9 @@ class TitleState extends MusicBeatState
 			existingDifficulties == null ||
 			existingDifficulties.length == 0
 		)
+		{
 			return;
+		}
 
 		curDifficulty += change;
 
