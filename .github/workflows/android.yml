@@ -52,9 +52,10 @@ jobs:
           haxelib git flixel-addons https://github.com/HaxeFlixel/flixel-addons.git
 
       - name: Setup Lime Android
-        run: |
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
-          yes | haxelib run lime setup android
+  run: |
+    export ANDROID_HOME=$ANDROID_SDK_ROOT
+    export JAVA_HOME=$JAVA_HOME_17_X64
+    haxelib run lime setup android
 
       - name: Build APK
         run: |
