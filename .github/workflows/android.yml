@@ -1,0 +1,88 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  buildAndroid:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.1.5
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 8
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android tools
+        run: |
+          sdkmanager "platform-tools" "platforms;android-29" "build-tools;29.0.3"
+
+      - name: Setup Haxelib
+        run: |
+          mkdir -p "$HOME/haxelib"
+          haxelib setup "$HOME/haxelib"
+
+      - name: Install Haxe libraries
+        run: |
+          haxelib install hxcpp
+          haxelib install lime 7.8.0
+          haxelib install openfl
+          haxelib install flixel 4.8.1
+          haxelib install flixel-ui
+          haxelib install hscript
+          haxelib install newgrounds
+          haxelib install flixel-tools
+          haxelib git flixel-addons https://github.com/HaxeFlixel/flixel-addons
+          haxelib git polymod https://github.com/larsiusprime/polymod.git
+
+      - name: Setup Lime and Flixel
+        run: |
+          haxelib run lime setup
+          haxelib run flixel-tools setup
+
+      - name: Create APIStuff
+        run: |
+          cat > source/APIStuff.hx <<'EOF'
+          package;
+
+          class APIStuff {
+            public static var API:String = "";
+            public static var EncKey:String = "";
+          }
+          EOF
+
+      - name: Configure Android
+        run: |
+          export ANDROID_HOME=$ANDROID_SDK_ROOT
+          haxelib run lime config android
+
+      - name: Build APK
+        run: |
+          export ANDROID_HOME=$ANDROID_SDK_ROOT
+          haxelib run lime build android -release
+
+      - name: Find APK
+        run: |
+          find export -type f -name "*.apk" -print
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Forever-Engine-Android
+          path: |
+            export/**/*.apk
