@@ -46,20 +46,16 @@ jobs:
           mkdir -p "$HOME/haxelib"
           haxelib setup "$HOME/haxelib"
 
-      - name: Install libraries
+      - name: Install Haxelib libraries
         run: |
           haxelib install lime 7.8.0
           haxelib install openfl
           haxelib install flixel 4.8.1
-          haxelib install flixel-addons
-          haxelib install flixel-ui
+          haxelib install flixel-addons 2.8.0
+          haxelib install flixel-ui 2.4.0
           haxelib install hscript
           haxelib install newgrounds
           haxelib install flixel-tools
-
-      - name: Install Polymod
-        run: |
-          haxelib git polymod https://github.com/larsiusprime/polymod.git
 
       - name: Setup Lime
         run: |
@@ -67,7 +63,12 @@ jobs:
 
       - name: Setup Lime Android
         run: |
-          printf "y\n$ANDROID_SDK_ROOT\n$ANDROID_SDK_ROOT/ndk/21.4.7075529\n" | haxelib run lime setup android
+          haxelib run lime setup android <<EOF
+          n
+          $ANDROID_SDK_ROOT
+          $ANDROID_SDK_ROOT/ndk/21.4.7075529
+          $JAVA_HOME
+          EOF
 
       - name: Create APIStuff
         run: |
@@ -80,6 +81,16 @@ jobs:
               public static var EncKey:String = "";
           }
           EOF
+
+      - name: Check Android configuration
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK=$ANDROID_SDK"
+          echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT"
+          echo "JAVA_HOME=$JAVA_HOME"
+          test -d "$ANDROID_SDK_ROOT"
+          test -d "$ANDROID_SDK_ROOT/build-tools/29.0.3"
+          test -d "$ANDROID_SDK_ROOT/ndk/21.4.7075529"
 
       - name: Build Android APK
         run: |
