@@ -65,10 +65,10 @@ jobs:
           }
           EOF
 
-      - name: Configure Android
-        run: |
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
-          haxelib run lime config android
+      - name: Build APK
+  run: |
+    export ANDROID_HOME=$ANDROID_SDK_ROOT
+    haxelib run lime build android -release
 
       - name: Build APK
         run: |
