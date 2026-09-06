@@ -50,6 +50,8 @@ jobs:
           haxelib install newgrounds
           haxelib install flixel-tools
 
+          haxelib git flixel-addons https://github.com/HaxeFlixel/flixel-addons.git
+
       - name: Setup Lime
         run: |
           haxelib run lime setup
