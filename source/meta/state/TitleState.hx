@@ -77,6 +77,10 @@ var menuItems:FlxTypedGroup<FlxSprite>;
 static var curSelected:Float = 0;
 static var curDifficulty:Int = 1;
 
+var transitioning:Bool = false;
+var selectedSomethin:Bool = false;
+var skippedIntro:Bool = false;
+
 override public function create():Void
 {
 	FlxG.mouse.visible = false;
@@ -180,7 +184,6 @@ override public function create():Void
 		bubbleRise.alpha.set(1, 1, 0, 0);
 		bubbleRise.lifespan.set(3, 5);
 		bubbleRise.loadParticles(Paths.image('particles/BubbleHit' + i), 500, 16, true);
-
 		bubbleRise.start(false, FlxG.random.float(0.35, 0.4), 1000000);
 		particles.add(bubbleRise);
 	}
@@ -261,7 +264,9 @@ override public function create():Void
 	updateSelection();
 
 	if (isMainMenu && initialized)
+	{
 		backToMain();
+	}
 	else
 	{
 		initialized = true;
@@ -272,7 +277,9 @@ override public function create():Void
 			warning();
 		}
 		else
+		{
 			startIntro();
+		}
 	}
 }
 
@@ -283,20 +290,12 @@ function startIntro()
 	warningSkip = true;
 }
 
-var transitioning:Bool = false;
-var selectedSomethin:Bool = false;
-var skippedIntro:Bool = false;
-
 override function update(elapsed:Float)
 {
 	if (FlxG.sound.music != null)
 		Conductor.songPosition = FlxG.sound.music.time;
 
-	/*
-		IMPORTANTE:
-		curAnim pode ser null em algumas situações no Android.
-		Por isso nunca acessamos .name ou .finished sem verificar.
-	*/
+	// Proteção contra Null Object Reference no Android.
 	if (island != null && island.animation != null && island.animation.curAnim != null)
 	{
 		if (island.animation.curAnim.name != 'transition')
@@ -316,7 +315,8 @@ override function update(elapsed:Float)
 			notLoopIsland = false;
 		}
 
-		if (island.animation.curAnim.name == 'transition'
+		if (island.animation.curAnim != null
+			&& island.animation.curAnim.name == 'transition'
 			&& island.animation.curAnim.finished
 			&& !bubblesDone)
 		{
@@ -350,7 +350,7 @@ override function update(elapsed:Float)
 		enterText.scale.y = FlxMath.lerp(1, enterText.scale.y, 0.95);
 	}
 
-	if (!selectedSomethin && isMainMenu && menuItems != null)
+	if (!selectedSomethin && isMainMenu)
 	{
 		menuItems.forEach(function(spr:FlxSprite)
 		{
@@ -373,7 +373,7 @@ override function update(elapsed:Float)
 		});
 	}
 
-	if (selectedSomethin && menuItems != null)
+	if (selectedSomethin)
 	{
 		menuItems.forEach(function(spr:FlxSprite)
 		{
@@ -410,90 +410,73 @@ override function update(elapsed:Float)
 	{
 		FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
 
-		if (enterText != null)
-		{
-			enterText.scale.x = 0.8;
-			enterText.scale.y = 0.8;
+		enterText.scale.x = 0.8;
+		enterText.scale.y = 0.8;
 
-			FlxTween.tween(enterText, {alpha: 0}, 1, {
-				onComplete: function(tween:FlxTween)
-				{
-					mainMenuSwitch();
-				}
-			});
-		}
-		else
-		{
-			mainMenuSwitch();
-		}
+		FlxTween.tween(enterText, {alpha: 0}, 1, {
+			onComplete: function(tween:FlxTween)
+			{
+				mainMenuSwitch();
+			}
+		});
 
 		transitioning = true;
 	}
 
-	if (pressedEnter
-		&& FlxG.save.data.skipable
-		&& !skippedIntro
-		&& initialized
-		&& warningSkip
-		&& !isMainMenu)
-	{
+	if (pressedEnter && FlxG.save.data.skipable && !skippedIntro && initialized && warningSkip && !isMainMenu)
 		skipIntro();
-	}
 
 	if (accepted && skippedIntro && isMainMenu && !selectedSomethin)
 	{
 		selectedSomethin = true;
 		FlxG.sound.play(Paths.sound('confirmMenu'));
 
-		if (menuItems != null)
+		menuItems.forEach(function(spr:FlxSprite)
 		{
-			menuItems.forEach(function(spr:FlxSprite)
+			if (spr == null)
+				return;
+
+			if (curSelected == spr.ID)
 			{
-				if (spr == null)
-					return;
+				spr.scale.x = 1.1;
+				spr.scale.y = 1.1;
 
-				if (curSelected == spr.ID)
-				{
-					spr.scale.x = 1.1;
-					spr.scale.y = 1.1;
+				FlxTween.tween(spr, {alpha: 0}, 0.5, {
+					ease: FlxEase.sineOut,
+					startDelay: 0.5,
+					onComplete: function(tween:FlxTween)
+					{
+						var daChoice:String = optionShit[Math.floor(curSelected)];
 
-					FlxTween.tween(spr, {alpha: 0}, 0.5, {
-						ease: FlxEase.sineOut,
-						startDelay: 0.5,
-						onComplete: function(tween:FlxTween)
+						switch (daChoice)
 						{
-							var daChoice:String = optionShit[Math.floor(curSelected)];
+							case 'story mode':
+								transition();
 
-							switch (daChoice)
-							{
-								case 'story mode':
-									transition();
+							case 'freeplay':
+								Main.switchState(this, new FreeplayState());
 
-								case 'freeplay':
-									Main.switchState(this, new FreeplayState());
+							case 'options':
+								transIn = FlxTransitionableState.defaultTransIn;
+								transOut = FlxTransitionableState.defaultTransOut;
+								Main.switchState(this, new OptionsMenuState());
 
-								case 'options':
-									transIn = FlxTransitionableState.defaultTransIn;
-									transOut = FlxTransitionableState.defaultTransOut;
-									Main.switchState(this, new OptionsMenuState());
+							case 'achievements':
+								Main.switchState(this, new AchievementsState());
 
-								case 'achievements':
-									Main.switchState(this, new AchievementsState());
-
-								case 'credits':
-									Main.switchState(this, new CreditState());
-							}
+							case 'credits':
+								Main.switchState(this, new CreditState());
 						}
-					});
-				}
-				else
-				{
-					FlxTween.tween(spr, {alpha: 0}, 0.5, {
-						ease: FlxEase.sineOut
-					});
-				}
-			});
-		}
+					}
+				});
+			}
+			else
+			{
+				FlxTween.tween(spr, {alpha: 0}, 0.5, {
+					ease: FlxEase.sineOut
+				});
+			}
+		});
 	}
 
 	if (FlxG.keys.justPressed.ESCAPE && !warningSkip && !isMainMenu && !fading)
@@ -501,24 +484,16 @@ override function update(elapsed:Float)
 		fading = true;
 		FlxG.sound.play(Paths.sound('cancelMenu'));
 
-		if (warningText != null)
-		{
-			FlxTween.tween(warningText, {alpha: 0}, 1, {
-				onComplete: function(tween:FlxTween)
-				{
-					FlxG.save.data.firstLaunch = true;
-					startIntro();
+		FlxTween.tween(warningText, {alpha: 0}, 1, {
+			onComplete: function(tween:FlxTween)
+			{
+				FlxG.save.data.firstLaunch = true;
+				startIntro();
 
-					if (black != null)
-						black.destroy();
-				}
-			});
-		}
-		else
-		{
-			FlxG.save.data.firstLaunch = true;
-			startIntro();
-		}
+				if (black != null)
+					black.destroy();
+			}
+		});
 	}
 
 	if (pressedEnter && !warningSkip && !isMainMenu && !fading)
@@ -526,21 +501,13 @@ override function update(elapsed:Float)
 		fading = true;
 		FlxG.sound.play(Paths.sound('confirmMenu'));
 
-		if (warningText != null)
-		{
-			FlxTween.tween(warningText, {alpha: 0}, 1, {
-				onComplete: function(tween:FlxTween)
-				{
-					FlxG.save.data.firstLaunch = true;
-					Main.switchState(this, new OptionsMenuState());
-				}
-			});
-		}
-		else
-		{
-			FlxG.save.data.firstLaunch = true;
-			Main.switchState(this, new OptionsMenuState());
-		}
+		FlxTween.tween(warningText, {alpha: 0}, 1, {
+			onComplete: function(tween:FlxTween)
+			{
+				FlxG.save.data.firstLaunch = true;
+				Main.switchState(this, new OptionsMenuState());
+			}
+		});
 	}
 
 	var up = controls.UP;
@@ -549,7 +516,7 @@ override function update(elapsed:Float)
 	var down_p = controls.DOWN_P;
 	var controlArray:Array<Bool> = [up, down, up_p, down_p];
 
-	if ((controlArray.contains(true)) && (!selectedSomethin) && (isMainMenu))
+	if (controlArray.contains(true) && !selectedSomethin && isMainMenu)
 	{
 		for (i in 0...controlArray.length)
 		{
@@ -629,34 +596,27 @@ override function beatHit()
 		switch (curBeat)
 		{
 			case 2:
-				if (heavy != null)
-					FlxTween.tween(heavy, {alpha: 1}, 1, {ease: FlxEase.sineOut});
+				FlxTween.tween(heavy, {alpha: 1}, 1, {ease: FlxEase.sineOut});
 
 			case 4:
-				if (heavy != null)
-					FlxTween.tween(heavy, {alpha: 0}, 1, {ease: FlxEase.sineOut});
+				FlxTween.tween(heavy, {alpha: 0}, 1, {ease: FlxEase.sineOut});
 
 			case 6:
-				if (foreverText != null)
-					FlxTween.tween(foreverText, {alpha: 1}, 1, {ease: FlxEase.sineOut});
+				FlxTween.tween(foreverText, {alpha: 1}, 1, {ease: FlxEase.sineOut});
 
 			case 8:
-				if (foreverText != null)
-					FlxTween.tween(foreverText, {alpha: 0}, 1, {ease: FlxEase.sineOut});
+				FlxTween.tween(foreverText, {alpha: 0}, 1, {ease: FlxEase.sineOut});
 
 			case 10:
-				if (tribute != null)
-					FlxTween.tween(tribute, {alpha: 1}, 1, {ease: FlxEase.sineOut});
+				FlxTween.tween(tribute, {alpha: 1}, 1, {ease: FlxEase.sineOut});
 
 			case 12:
-				if (tribute != null)
-					FlxTween.tween(tribute, {alpha: 0}, 1, {ease: FlxEase.sineOut});
+				FlxTween.tween(tribute, {alpha: 0}, 1, {ease: FlxEase.sineOut});
 
 			case 14:
 				if (island != null)
 				{
 					island.animation.play('transition', true);
-
 					FlxTween.tween(island, {y: -1500}, 0.7, {
 						ease: FlxEase.sineIn
 					});
@@ -743,16 +703,10 @@ function mainMenuSwitch()
 	Discord.changePresence('Menu Screen', 'Main Menu', " ", titleImage);
 	#end
 
-	if (logoBl == null)
-		return;
-
 	FlxTween.tween(logoBl, {y: -1000}, 1.2, {
 		ease: FlxEase.backIn,
 		onComplete: function(tween:FlxTween)
 		{
-			if (menuItems == null)
-				return;
-
 			menuItems.forEach(function(spr:FlxSprite)
 			{
 				if (spr == null)
@@ -760,9 +714,7 @@ function mainMenuSwitch()
 
 				if (spatulaHUD != null && spatulaHUD.spatula != null)
 				{
-					FlxTween.tween(spatulaHUD.spatula, {
-						y: 0
-					}, 0.6, {
+					FlxTween.tween(spatulaHUD.spatula, {y: 0}, 0.6, {
 						ease: FlxEase.smootherStepOut
 					});
 				}
