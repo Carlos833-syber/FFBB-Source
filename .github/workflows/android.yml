@@ -25,13 +25,6 @@ jobs:
         with:
           haxe-version: 4.1.5
 
-      - name: Check versions
-        run: |
-          echo "Java:"
-          java -version
-          echo "Haxe:"
-          haxe --version
-
       - name: Setup Android
         uses: android-actions/setup-android@v3
 
@@ -42,7 +35,7 @@ jobs:
           sdkmanager "build-tools;29.0.3"
           sdkmanager "ndk;21.4.7075529"
 
-      - name: Configure Android environment
+      - name: Configure Android variables
         run: |
           echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
           echo "ANDROID_SDK=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
@@ -53,7 +46,7 @@ jobs:
           mkdir -p "$HOME/haxelib"
           haxelib setup "$HOME/haxelib"
 
-      - name: Install project libraries
+      - name: Install libraries
         run: |
           haxelib install lime 7.8.0
           haxelib install openfl
@@ -68,9 +61,13 @@ jobs:
         run: |
           haxelib git polymod https://github.com/larsiusprime/polymod.git
 
-      - name: Configure Lime
+      - name: Setup Lime
         run: |
           haxelib run lime setup
+
+      - name: Setup Lime Android
+        run: |
+          printf "y\n$ANDROID_SDK_ROOT\n$ANDROID_SDK_ROOT/ndk/21.4.7075529\n" | haxelib run lime setup android
 
       - name: Create APIStuff
         run: |
