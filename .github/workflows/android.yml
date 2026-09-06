@@ -30,45 +30,29 @@ jobs:
 
       - name: Install Android tools
         run: |
-          sdkmanager "platform-tools" "platforms;android-29" "build-tools;29.0.3"
+          sdkmanager "platform-tools"
+          sdkmanager "platforms;android-29"
+          sdkmanager "build-tools;29.0.3"
 
       - name: Setup Haxelib
         run: |
           mkdir -p "$HOME/haxelib"
           haxelib setup "$HOME/haxelib"
 
-      - name: Install Haxe libraries
+      - name: Install dependencies
         run: |
           haxelib install hxcpp
-          haxelib install lime 7.8.0
+          haxelib install lime
           haxelib install openfl
-          haxelib install flixel 4.8.1
+          haxelib install flixel
           haxelib install flixel-ui
           haxelib install hscript
           haxelib install newgrounds
           haxelib install flixel-tools
-          haxelib git flixel-addons https://github.com/HaxeFlixel/flixel-addons
-          haxelib git polymod https://github.com/larsiusprime/polymod.git
 
-      - name: Setup Lime and Flixel
+      - name: Setup Lime
         run: |
           haxelib run lime setup
-
-      - name: Create APIStuff
-        run: |
-          cat > source/APIStuff.hx <<'EOF'
-          package;
-
-          class APIStuff {
-            public static var API:String = "";
-            public static var EncKey:String = "";
-          }
-          EOF
-
-      - name: Build APK
-  run: |
-    export ANDROID_HOME=$ANDROID_SDK_ROOT
-    haxelib run lime build android -release
 
       - name: Build APK
         run: |
