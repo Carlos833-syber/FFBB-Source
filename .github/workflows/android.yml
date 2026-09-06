@@ -35,7 +35,7 @@ jobs:
           sdkmanager "build-tools;29.0.3"
           sdkmanager "ndk;21.4.7075529"
 
-      - name: Configure Android variables
+      - name: Configure Android
         run: |
           echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
           echo "ANDROID_SDK=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
@@ -46,7 +46,7 @@ jobs:
           mkdir -p "$HOME/haxelib"
           haxelib setup "$HOME/haxelib"
 
-      - name: Install Haxelib libraries
+      - name: Install libraries
         run: |
           haxelib install lime 7.8.0
           haxelib install openfl
@@ -61,14 +61,13 @@ jobs:
         run: |
           haxelib run lime setup
 
-      - name: Setup Lime Android
+      - name: Configure Lime Android
         run: |
-          haxelib run lime setup android <<EOF
-          n
-          $ANDROID_SDK_ROOT
-          $ANDROID_SDK_ROOT/ndk/21.4.7075529
-          $JAVA_HOME
-          EOF
+          mkdir -p "$HOME/.lime"
+          printf '%s\n' "$ANDROID_SDK_ROOT" \
+            "$ANDROID_SDK_ROOT/ndk/21.4.7075529" \
+            "$JAVA_HOME" \
+            | haxelib run lime setup android
 
       - name: Create APIStuff
         run: |
@@ -82,15 +81,15 @@ jobs:
           }
           EOF
 
-      - name: Check Android configuration
+      - name: Verify Android
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "ANDROID_SDK=$ANDROID_SDK"
-          echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT"
-          echo "JAVA_HOME=$JAVA_HOME"
-          test -d "$ANDROID_SDK_ROOT"
+          echo "SDK: $ANDROID_SDK_ROOT"
+          echo "NDK: $ANDROID_NDK_ROOT"
+          echo "JAVA: $JAVA_HOME"
+
           test -d "$ANDROID_SDK_ROOT/build-tools/29.0.3"
-          test -d "$ANDROID_SDK_ROOT/ndk/21.4.7075529"
+          test -d "$ANDROID_NDK_ROOT"
+          test -d "$JAVA_HOME"
 
       - name: Build Android APK
         run: |
