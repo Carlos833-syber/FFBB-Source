@@ -50,7 +50,7 @@ jobs:
           haxelib install hscript
           haxelib install newgrounds
           haxelib install flixel-tools
-          haxelib git flixel-addons https://github.com/HaxeFlixel/flixel-addons.git
+          haxelib git flixel-addons https://github.com/HaxeFlixel/flixel-addons.git 2.8.1
 
       - name: Setup Lime Android
         run: |
