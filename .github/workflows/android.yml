@@ -14,11 +14,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Java 17
+      - name: Setup Java 8
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 8
 
       - name: Setup Haxe 4.1.5
         uses: krdlab/setup-haxe@master
@@ -62,13 +62,7 @@ jobs:
           FLIXEL_DIR="$HOME/haxelib/flixel/4,10,0"
           FILE="$FLIXEL_DIR/flixel/input/actions/FlxAction.hx"
 
-          echo "Patching:"
-          echo "$FILE"
-
-          grep -q "FlxActionInputDigital.FlxActionInputDigitalAndroid" "$FILE" || \
           sed -i '/FlxActionInputDigitalMouseWheel;/a #if android\nimport flixel.input.actions.FlxActionInputDigital.FlxActionInputDigitalAndroid;\n#end' "$FILE"
-
-          grep -n "FlxActionInputDigitalAndroid" "$FILE"
 
       - name: Setup Lime
         run: |
@@ -94,12 +88,13 @@ jobs:
           }
           EOF
 
-      - name: Verify Android
+      - name: Verify Java and Android
         run: |
+          java -version
+          haxe --version
+
           echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "ANDROID_SDK=$ANDROID_SDK"
           echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT"
-          echo "JAVA_HOME=$JAVA_HOME"
 
           test -d "$ANDROID_SDK_ROOT/build-tools/29.0.3"
           test -d "$ANDROID_NDK_ROOT"
