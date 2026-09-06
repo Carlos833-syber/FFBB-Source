@@ -85,31 +85,9 @@ class TitleState extends MusicBeatState
 		FlxG.mouse.useSystemCursor = false;
 
 		controls.setKeyboardScheme(None, false);
-
 		titleImage = "freaky";
 
 		super.create();
-
-		#if !html5
-		if (!initialized)
-		{
-			meta.data.dependency.Discord.changePresence(
-				'Beginning Game',
-				'Title Screen',
-				" ",
-				titleImage
-			);
-		}
-		else
-		{
-			meta.data.dependency.Discord.changePresence(
-				'Menu Screen',
-				'Main Menu',
-				" ",
-				titleImage
-			);
-		}
-		#end
 
 		persistentUpdate = true;
 
@@ -121,7 +99,6 @@ class TitleState extends MusicBeatState
 		pineapple = new FlxSprite().loadGraphic(
 			Paths.image('menus/base/titleandmainmenu/mainmenuBG')
 		);
-
 		pineapple.setGraphicSize(Std.int(pineapple.width * 1.05));
 		pineapple.antialiasing = true;
 		pineapple.screenCenter();
@@ -132,47 +109,40 @@ class TitleState extends MusicBeatState
 		spongeDance.frames = Paths.getSparrowAtlas(
 			'menus/base/titleandmainmenu/SPONGEHANDS'
 		);
-
 		spongeDance.animation.addByPrefix(
 			'danceLeft',
 			'SB_DOUBLETIME0',
 			12,
 			false
 		);
-
 		spongeDance.animation.addByPrefix(
 			'danceRight',
 			'SB_DOUBLETIMECHANGE',
 			12,
 			false
 		);
-
 		spongeDance.antialiasing = true;
 		add(spongeDance);
 
 		menuBFGF = new FlxSprite(-130, -15);
-
 		menuBFGF.loadGraphic(
 			Paths.image('menus/base/titleandmainmenu/menuBFGF'),
 			true,
 			975,
 			777
 		);
-
 		menuBFGF.animation.add(
 			'dance',
 			[0, 1, 2, 3, 4, 5],
 			12,
 			false
 		);
-
 		menuBFGF.scrollFactor.set();
 		menuBFGF.visible = false;
 		menuBFGF.antialiasing = true;
 		add(menuBFGF);
 
 		island = new FlxSprite();
-
 		island.loadGraphic(
 			Paths.image('menus/base/titleandmainmenu/island'),
 			true,
@@ -186,14 +156,12 @@ class TitleState extends MusicBeatState
 			12,
 			false
 		);
-
 		island.animation.add(
 			'loopReverse',
 			[6, 5, 4, 3, 2, 1],
 			12,
 			false
 		);
-
 		island.animation.add(
 			'transition',
 			[7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
@@ -202,17 +170,14 @@ class TitleState extends MusicBeatState
 		);
 
 		island.animation.play('loop');
-
 		island.setGraphicSize(Std.int(island.width * 1.05));
 		island.antialiasing = true;
 		island.screenCenter();
-
 		add(island);
 
 		heavy = new FlxSprite().loadGraphic(
 			Paths.image('menus/base/titleandmainmenu/originalBy')
 		);
-
 		heavy.screenCenter();
 		heavy.antialiasing = true;
 		heavy.alpha = 0;
@@ -221,7 +186,6 @@ class TitleState extends MusicBeatState
 		foreverText = new FlxSprite().loadGraphic(
 			Paths.image('menus/base/titleandmainmenu/forever')
 		);
-
 		foreverText.screenCenter();
 		foreverText.antialiasing = true;
 		foreverText.setGraphicSize(
@@ -233,7 +197,6 @@ class TitleState extends MusicBeatState
 		tribute = new FlxSprite().loadGraphic(
 			Paths.image('menus/base/titleandmainmenu/tribute')
 		);
-
 		tribute.screenCenter();
 		tribute.antialiasing = true;
 		tribute.setGraphicSize(
@@ -243,14 +206,12 @@ class TitleState extends MusicBeatState
 		add(tribute);
 
 		bubbles = new FlxSprite();
-
 		bubbles.loadGraphic(
 			Paths.image('menus/base/titleandmainmenu/bubbles'),
 			true,
 			1284,
 			724
 		);
-
 		bubbles.animation.add(
 			'rise',
 			[
@@ -260,7 +221,6 @@ class TitleState extends MusicBeatState
 			30,
 			false
 		);
-
 		bubbles.screenCenter();
 		bubbles.visible = false;
 		bubbles.antialiasing = true;
@@ -270,9 +230,11 @@ class TitleState extends MusicBeatState
 
 		for (i in 0...5)
 		{
-			var bubbleRise:FlxEmitter = new FlxEmitter(-1000, 850);
+			var bubbleRise:FlxEmitter =
+				new FlxEmitter(-1000, 850);
 
-			bubbleRise.launchMode = FlxEmitterMode.SQUARE;
+			bubbleRise.launchMode =
+				FlxEmitterMode.SQUARE;
 
 			bubbleRise.velocity.set(
 				-50,
@@ -319,7 +281,9 @@ class TitleState extends MusicBeatState
 			bubbleRise.lifespan.set(3, 5);
 
 			bubbleRise.loadParticles(
-				Paths.image('particles/BubbleHit' + i),
+				Paths.image(
+					'particles/BubbleHit' + i
+				),
 				500,
 				16,
 				true
@@ -338,9 +302,10 @@ class TitleState extends MusicBeatState
 		add(particles);
 
 		logoBl = new FlxSprite().loadGraphic(
-			Paths.image('menus/base/titleandmainmenu/icon')
+			Paths.image(
+				'menus/base/titleandmainmenu/icon'
+			)
 		);
-
 		logoBl.antialiasing = true;
 		logoBl.scrollFactor.set();
 		logoBl.screenCenter(Y);
@@ -367,20 +332,22 @@ class TitleState extends MusicBeatState
 		enterText.y += 650;
 		enterText.x =
 			logoBl.getGraphicMidpoint().x -
-			(enterText.width - (enterText.width / 2));
-
+			(enterText.width -
+			(enterText.width / 2));
 		enterText.antialiasing = true;
 		enterText.visible = false;
 		add(enterText);
 
-		menuItems = new FlxTypedGroup<FlxSprite>();
+		menuItems =
+			new FlxTypedGroup<FlxSprite>();
 
 		for (i in 0...optionShit.length)
 		{
-			var menuItem:FlxSprite = new FlxSprite(
-				1300,
-				0 + (i * 142)
-			);
+			var menuItem:FlxSprite =
+				new FlxSprite(
+					1300,
+					0 + (i * 142)
+				);
 
 			menuItem.loadGraphic(
 				Paths.image(
@@ -393,7 +360,6 @@ class TitleState extends MusicBeatState
 
 			menuItem.animation.frameIndex = i;
 			menuItem.ID = i;
-
 			menuItems.add(menuItem);
 
 			menuItem.scrollFactor.set();
@@ -406,7 +372,11 @@ class TitleState extends MusicBeatState
 			0,
 			42,
 			0,
-			'<' + Std.string(existingDifficulties[curDifficulty]) + '>'
+			'<' +
+			Std.string(
+				existingDifficulties[curDifficulty]
+			) +
+			'>'
 		);
 
 		diffText.setFormat(
@@ -427,11 +397,15 @@ class TitleState extends MusicBeatState
 		add(spatulaHUD);
 
 		transitionBG = new FlxSprite(-85).loadGraphic(
-			Paths.image('menus/base/transition/bgClouds')
+			Paths.image(
+				'menus/base/transition/bgClouds'
+			)
 		);
 
 		transitionBG.setGraphicSize(
-			Std.int(transitionBG.width * 2)
+			Std.int(
+				transitionBG.width * 2
+			)
 		);
 
 		transitionBG.visible = false;
@@ -439,23 +413,26 @@ class TitleState extends MusicBeatState
 		transitionBG.scrollFactor.set();
 		transitionBG.updateHitbox();
 		transitionBG.screenCenter();
-
 		add(transitionBG);
 
-		bubbleEffect = new FlxTypedGroup<FlxSprite>();
+		bubbleEffect =
+			new FlxTypedGroup<FlxSprite>();
 		add(bubbleEffect);
 
 		for (i in 0...40)
 		{
-			var bubble:FlxSprite = new FlxSprite(
-				-10 + (35 * i),
-				740 +
-				(FlxG.random.int(10, 70) * i) +
-				((i >= 20) ? -100 : 0)
-			);
+			var bubble:FlxSprite =
+				new FlxSprite(
+					-10 + (35 * i),
+					740 +
+					(FlxG.random.int(10, 70) * i) +
+					((i >= 20) ? -100 : 0)
+				);
 
 			bubble.loadGraphic(
-				Paths.image('particles/BubbleTransition')
+				Paths.image(
+					'particles/BubbleTransition'
+				)
 			);
 
 			bubble.setGraphicSize(
@@ -527,19 +504,20 @@ class TitleState extends MusicBeatState
 	override function update(elapsed:Float):Void
 	{
 		if (FlxG.sound.music != null)
-			Conductor.songPosition = FlxG.sound.music.time;
+			Conductor.songPosition =
+				FlxG.sound.music.time;
 
-		/*
-			Proteção Android:
-			curAnim pode ser null durante a inicialização.
-		*/
+		// Proteção contra Null Object Reference.
 		if (
 			island != null &&
 			island.animation != null &&
 			island.animation.curAnim != null
 		)
 		{
-			if (island.animation.curAnim.name != 'transition')
+			if (
+				island.animation.curAnim.name !=
+				'transition'
+			)
 			{
 				if (
 					island.animation.curAnim.finished &&
@@ -567,7 +545,8 @@ class TitleState extends MusicBeatState
 
 			if (
 				island.animation.curAnim != null &&
-				island.animation.curAnim.name == 'transition' &&
+				island.animation.curAnim.name ==
+				'transition' &&
 				island.animation.curAnim.finished &&
 				!bubblesDone
 			)
@@ -587,7 +566,8 @@ class TitleState extends MusicBeatState
 		var pressedEnter:Bool =
 			FlxG.keys.justPressed.ENTER;
 
-		var accepted:Bool = controls.ACCEPT;
+		var accepted:Bool =
+			controls.ACCEPT;
 
 		if (
 			spongeDance != null &&
@@ -595,10 +575,12 @@ class TitleState extends MusicBeatState
 		)
 		{
 			spongeDance.y =
-				pineapple.getGraphicMidpoint().y + 1040;
+				pineapple.getGraphicMidpoint().y +
+				1040;
 
 			spongeDance.x =
-				pineapple.getGraphicMidpoint().x - 500;
+				pineapple.getGraphicMidpoint().x -
+				500;
 		}
 
 		if (logoBl != null)
@@ -659,30 +641,35 @@ class TitleState extends MusicBeatState
 			}
 		}
 
-		if (selectedSomethin && menuItems != null)
+		if (
+			selectedSomethin &&
+			menuItems != null
+		)
 		{
-			menuItems.forEach(function(spr:FlxSprite)
-			{
-				if (
-					spr != null &&
-					curSelected == spr.ID
-				)
+			menuItems.forEach(
+				function(spr:FlxSprite)
 				{
-					spr.scale.x =
-						FlxMath.lerp(
-							1.05,
-							spr.scale.x,
-							0.9
-						);
+					if (
+						spr != null &&
+						curSelected == spr.ID
+					)
+					{
+						spr.scale.x =
+							FlxMath.lerp(
+								1.05,
+								spr.scale.x,
+								0.9
+							);
 
-					spr.scale.y =
-						FlxMath.lerp(
-							1.05,
-							spr.scale.y,
-							0.9
-						);
+						spr.scale.y =
+							FlxMath.lerp(
+								1.05,
+								spr.scale.y,
+								0.9
+							);
+					}
 				}
-			});
+			);
 		}
 
 		#if mobile
@@ -729,10 +716,11 @@ class TitleState extends MusicBeatState
 					{alpha: 0},
 					1,
 					{
-						onComplete: function(tween:FlxTween)
-						{
-							mainMenuSwitch();
-						}
+						onComplete:
+							function(tween:FlxTween)
+							{
+								mainMenuSwitch();
+							}
 					}
 				);
 			}
@@ -770,83 +758,89 @@ class TitleState extends MusicBeatState
 				Paths.sound('confirmMenu')
 			);
 
-			menuItems.forEach(function(spr:FlxSprite)
-			{
-				if (spr == null)
-					return;
-
-				if (curSelected == spr.ID)
+			menuItems.forEach(
+				function(spr:FlxSprite)
 				{
-					spr.scale.x = 1.1;
-					spr.scale.y = 1.1;
+					if (spr == null)
+						return;
 
-					FlxTween.tween(
-						spr,
-						{alpha: 0},
-						0.5,
-						{
-							ease: FlxEase.sineOut,
-							startDelay: 0.5,
+					if (curSelected == spr.ID)
+					{
+						spr.scale.x = 1.1;
+						spr.scale.y = 1.1;
 
-							onComplete:
-								function(tween:FlxTween)
+						FlxTween.tween(
+							spr,
+							{alpha: 0},
+							0.5,
 							{
-								var daChoice:String =
-									optionShit[
-										Math.floor(curSelected)
-									];
+								ease: FlxEase.sineOut,
+								startDelay: 0.5,
 
-								switch (daChoice)
-								{
-									case 'story mode':
-										transition();
+								onComplete:
+									function(tween:FlxTween)
+									{
+										var daChoice:String =
+											optionShit[
+												Math.floor(
+													curSelected
+												)
+											];
 
-									case 'freeplay':
-										Main.switchState(
-											this,
-											new FreeplayState()
-										);
+										switch (daChoice)
+										{
+											case 'story mode':
+												transition();
 
-									case 'options':
-										transIn =
-											FlxTransitionableState.defaultTransIn;
+											case 'freeplay':
+												Main.switchState(
+													this,
+													new FreeplayState()
+												);
 
-										transOut =
-											FlxTransitionableState.defaultTransOut;
+											case 'options':
+												transIn =
+													FlxTransitionableState
+														.defaultTransIn;
 
-										Main.switchState(
-											this,
-											new OptionsMenuState()
-										);
+												transOut =
+													FlxTransitionableState
+														.defaultTransOut;
 
-									case 'achievements':
-										Main.switchState(
-											this,
-											new AchievementsState()
-										);
+												Main.switchState(
+													this,
+													new OptionsMenuState()
+												);
 
-									case 'credits':
-										Main.switchState(
-											this,
-											new CreditState()
-										);
-								}
+											case 'achievements':
+												Main.switchState(
+													this,
+													new AchievementsState()
+												);
+
+											case 'credits':
+												Main.switchState(
+													this,
+													new CreditState()
+												);
+										}
+									}
 							}
-						}
-					);
+						);
+					}
+					else
+					{
+						FlxTween.tween(
+							spr,
+							{alpha: 0},
+							0.5,
+							{
+								ease: FlxEase.sineOut
+							}
+						);
+					}
 				}
-				else
-				{
-					FlxTween.tween(
-						spr,
-						{alpha: 0},
-						0.5,
-						{
-							ease: FlxEase.sineOut
-						}
-					);
-				}
-			});
+			);
 		}
 
 		if (
@@ -870,7 +864,9 @@ class TitleState extends MusicBeatState
 					onComplete:
 						function(tween:FlxTween)
 						{
-							FlxG.save.data.firstLaunch = true;
+							FlxG.save.data.firstLaunch =
+								true;
+
 							startIntro();
 
 							if (black != null)
@@ -901,7 +897,8 @@ class TitleState extends MusicBeatState
 					onComplete:
 						function(tween:FlxTween)
 						{
-							FlxG.save.data.firstLaunch = true;
+							FlxG.save.data.firstLaunch =
+								true;
 
 							Main.switchState(
 								this,
@@ -1036,7 +1033,10 @@ class TitleState extends MusicBeatState
 							heavy,
 							{alpha: 1},
 							1,
-							{ease: FlxEase.sineOut}
+							{
+								ease:
+									FlxEase.sineOut
+							}
 						);
 
 				case 4:
@@ -1045,7 +1045,10 @@ class TitleState extends MusicBeatState
 							heavy,
 							{alpha: 0},
 							1,
-							{ease: FlxEase.sineOut}
+							{
+								ease:
+									FlxEase.sineOut
+							}
 						);
 
 				case 6:
@@ -1054,7 +1057,10 @@ class TitleState extends MusicBeatState
 							foreverText,
 							{alpha: 1},
 							1,
-							{ease: FlxEase.sineOut}
+							{
+								ease:
+									FlxEase.sineOut
+							}
 						);
 
 				case 8:
@@ -1063,7 +1069,10 @@ class TitleState extends MusicBeatState
 							foreverText,
 							{alpha: 0},
 							1,
-							{ease: FlxEase.sineOut}
+							{
+								ease:
+									FlxEase.sineOut
+							}
 						);
 
 				case 10:
@@ -1072,7 +1081,10 @@ class TitleState extends MusicBeatState
 							tribute,
 							{alpha: 1},
 							1,
-							{ease: FlxEase.sineOut}
+							{
+								ease:
+									FlxEase.sineOut
+							}
 						);
 
 				case 12:
@@ -1081,7 +1093,10 @@ class TitleState extends MusicBeatState
 							tribute,
 							{alpha: 0},
 							1,
-							{ease: FlxEase.sineOut}
+							{
+								ease:
+									FlxEase.sineOut
+							}
 						);
 
 				case 14:
@@ -1097,7 +1112,8 @@ class TitleState extends MusicBeatState
 							{y: -1500},
 							0.7,
 							{
-								ease: FlxEase.sineIn
+								ease:
+									FlxEase.sineIn
 							}
 						);
 					}
@@ -1109,7 +1125,8 @@ class TitleState extends MusicBeatState
 							{y: -1920},
 							1.2,
 							{
-								ease: FlxEase.sineInOut
+								ease:
+									FlxEase.sineInOut
 							}
 						);
 					}
@@ -1132,7 +1149,6 @@ class TitleState extends MusicBeatState
 				!Init.trueSettings.get(
 					'Disable Flashing Lights'
 				)
-			)
 			{
 				FlxG.camera.flash(
 					FlxColor.WHITE,
@@ -1213,14 +1229,7 @@ class TitleState extends MusicBeatState
 
 	function mainMenuSwitch():Void
 	{
-		#if !html5
-		meta.data.dependency.Discord.changePresence(
-			'Menu Screen',
-			'Main Menu',
-			" ",
-			titleImage
-		);
-		#end
+		// Discord desativado no Android.
 
 		if (logoBl == null)
 			return;
