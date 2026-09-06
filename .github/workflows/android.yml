@@ -35,7 +35,7 @@ jobs:
           sdkmanager "build-tools;29.0.3"
           sdkmanager "ndk;21.4.7075529"
 
-      - name: Configure Android
+      - name: Configure Android variables
         run: |
           echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
           echo "ANDROID_SDK=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
@@ -46,12 +46,12 @@ jobs:
           mkdir -p "$HOME/haxelib"
           haxelib setup "$HOME/haxelib"
 
-      - name: Install libraries
+      - name: Install Haxelib libraries
         run: |
           haxelib install lime 7.8.0
           haxelib install openfl
-          haxelib install flixel 4.8.1
-          haxelib install flixel-addons 2.8.0
+          haxelib install flixel 4.10.0
+          haxelib install flixel-addons 2.11.0
           haxelib install flixel-ui 2.4.0
           haxelib install hscript
           haxelib install newgrounds
@@ -64,7 +64,8 @@ jobs:
       - name: Configure Lime Android
         run: |
           mkdir -p "$HOME/.lime"
-          printf '%s\n' "$ANDROID_SDK_ROOT" \
+          printf '%s\n' \
+            "$ANDROID_SDK_ROOT" \
             "$ANDROID_SDK_ROOT/ndk/21.4.7075529" \
             "$JAVA_HOME" \
             | haxelib run lime setup android
@@ -83,9 +84,10 @@ jobs:
 
       - name: Verify Android
         run: |
-          echo "SDK: $ANDROID_SDK_ROOT"
-          echo "NDK: $ANDROID_NDK_ROOT"
-          echo "JAVA: $JAVA_HOME"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK=$ANDROID_SDK"
+          echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT"
+          echo "JAVA_HOME=$JAVA_HOME"
 
           test -d "$ANDROID_SDK_ROOT/build-tools/29.0.3"
           test -d "$ANDROID_NDK_ROOT"
