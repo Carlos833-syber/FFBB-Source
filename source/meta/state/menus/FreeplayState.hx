@@ -709,15 +709,17 @@ class FreeplayState extends MusicBeatState
 			- scoreText.width
 			- 5;
 
-		shinies.x =
+		shinies.x = Std.int(
 			(FlxG.width * 0.930)
 			- scoreText.width
-			- 5;
+			- 5
+		);
 
-		diffText.x =
+		diffText.x = Std.int(
 			(signs.x - 185)
 			+ (signs.width / 2)
-			- (diffText.width / 2);
+			- (diffText.width / 2)
+		);
 	}
 
 	function changeDiff(change:Int = 0)
