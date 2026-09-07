@@ -97,7 +97,7 @@ class TitleState extends MusicBeatState
 			existingDifficulties.push(i);
 
 		pineapple = new FlxSprite().loadGraphic(
-			Paths.image('menus/base/titleandmainmenu/mainmenuBG')
+			Paths.image('menus/base/titleandmainmenu/mainmenubg')
 		);
 		pineapple.setGraphicSize(Std.int(pineapple.width * 1.05));
 		pineapple.antialiasing = true;
