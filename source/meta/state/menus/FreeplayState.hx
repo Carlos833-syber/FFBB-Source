@@ -101,6 +101,7 @@ class FreeplayState extends MusicBeatState
 		super.create();
 
 		mutex = new Mutex();
+
 		GameOverSubstate.fishHadEnough = 0;
 
 		for (i in 0...Main.gameWeeks.length)
@@ -590,7 +591,7 @@ class FreeplayState extends MusicBeatState
 		var lerpVal:Float =
 			Main.framerateAdjust(0.1);
 
-		lerpScore = Math.floor(
+		lerpScore = Std.int(
 			FlxMath.lerp(
 				lerpScore,
 				intendedScore,
