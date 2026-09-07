@@ -1,58 +1,49 @@
 package meta.state.menus;
 
-import flash.text.TextField;
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.FlxSubState;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.effects.particles.FlxEmitter;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
-import flixel.math.FlxRandom;
-import flixel.system.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
-import flixel.tweens.misc.ColorTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
-import gameObjects.userInterface.HealthIcon;
 import gameObjects.userInterface.SpatulaHUD;
 import lime.utils.Assets;
 import meta.MusicBeat.MusicBeatState;
-import meta.data.*;
-import meta.data.Song.SwagSong;
-import meta.data.dependency.Discord;
-import meta.subState.*;
-import openfl.media.Sound;
-import sys.FileSystem;
+import meta.data.Song;
+import meta.subState.GameOverSubstate;
+import meta.subState.PlayState;
 import sys.thread.Mutex;
 import sys.thread.Thread;
-
-using StringTools;
 
 class FreeplayState extends MusicBeatState
 {
 	var songs:Array<SongMetadata> = [];
 
 	var selector:FlxText;
+
 	public static var curSelected:Int = 0;
-	var curSongPlaying:Int = -1;
 	public static var curDifficulty:Int = 1;
 
 	var scoreText:FlxText;
 	var diffText:FlxText;
+
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;
 
 	var songThread:Thread;
 	var threadActive:Bool = true;
 	var mutex:Mutex;
-	var songToPlay:Sound = null;
+	var songToPlay:Dynamic = null;
 
 	var transitionBG:FlxSprite;
 	var shinies:FlxSprite;
 	var loading:FlxText;
+
 	var selectedSong:Bool = false;
 
 	var spatulaHUD:SpatulaHUD;
@@ -73,11 +64,19 @@ class FreeplayState extends MusicBeatState
 		'METALLIC CLARINET PLAYER IN: scrapped-metal.......'
 	];
 
-	private var goldenSpatulaCost:Array<Int> = [1, 1, 1, 2, 3, 4];
+	private var goldenSpatulaCost:Array<Int> = [
+		1,
+		1,
+		1,
+		2,
+		3,
+		4
+	];
 
 	private var grpOrders:FlxTypedGroup<FlxText>;
 
-	private var mainColor = FlxColor.WHITE;
+	private var mainColor:FlxColor = FlxColor.WHITE;
+
 	private var bgBack:FlxSprite;
 	private var thereIAm:FlxSprite;
 	private var bg:FlxSprite;
@@ -96,8 +95,6 @@ class FreeplayState extends MusicBeatState
 
 		GameOverSubstate.fishHadEnough = 0;
 
-		var folderSongs:Array<String> = CoolUtil.returnAssetsLibrary('songs', 'assets');
-
 		for (i in 0...Main.gameWeeks.length)
 		{
 			addWeek(
@@ -107,22 +104,18 @@ class FreeplayState extends MusicBeatState
 				Main.gameWeeks[i][2]
 			);
 
-			for (j in cast(Main.gameWeeks[i][0], Array<Dynamic>))
-				existingSongs.push(j.toLowerCase());
+			for (song in cast(Main.gameWeeks[i][0], Array<Dynamic>))
+			{
+				existingSongs.push(
+					Std.string(song).toLowerCase()
+				);
+			}
 		}
-
-		#if !android
-		Discord.changePresence(
-			'Ordering A Battle',
-			'Freeplay',
-			" ",
-			TitleState.titleImage
-		);
-		#end
 
 		bgBack = new FlxSprite().loadGraphic(
 			Paths.image('menus/base/freeplay/bgBack')
 		);
+
 		bgBack.antialiasing = true;
 		add(bgBack);
 
@@ -132,12 +125,14 @@ class FreeplayState extends MusicBeatState
 		).loadGraphic(
 			Paths.image('menus/base/freeplay/thereIAm')
 		);
+
 		thereIAm.antialiasing = true;
 		add(thereIAm);
 
 		bg = new FlxSprite().loadGraphic(
 			Paths.image('menus/base/freeplay/bg')
 		);
+
 		bg.antialiasing = true;
 		add(bg);
 
@@ -147,12 +142,14 @@ class FreeplayState extends MusicBeatState
 		).loadGraphic(
 			Paths.image('menus/base/freeplay/signs')
 		);
+
 		signs.antialiasing = true;
 		add(signs);
 
 		labels = new FlxText(
 			50,
 			205,
+			0,
 			"Songs                                              Spatula Cost"
 		);
 
@@ -174,6 +171,7 @@ class FreeplayState extends MusicBeatState
 			var order:FlxText = new FlxText(
 				50,
 				240 + (i * 40),
+				0,
 				galleyGrubOrders[i]
 			);
 
@@ -184,18 +182,23 @@ class FreeplayState extends MusicBeatState
 				LEFT
 			);
 
-			if (i < goldenSpatulaCost.length
-				&& goldenSpatulaCost[i] > FlxG.save.data.spat)
+			if (
+				i < goldenSpatulaCost.length
+				&& goldenSpatulaCost[i] > FlxG.save.data.spat
+			)
 			{
-				order.text = 'KRABBY SURPRISE.............................';
+				order.text =
+					'KRABBY SURPRISE.............................';
 			}
 
 			order.antialiasing = true;
 			order.ID = i;
 
-			if (i >= 3
+			if (
+				i >= 3
 				&& goldenSpatulaCost.length > 2
-				&& goldenSpatulaCost[2] <= FlxG.save.data.spat)
+				&& goldenSpatulaCost[2] <= FlxG.save.data.spat
+			)
 			{
 				order.y += 30;
 			}
@@ -208,6 +211,7 @@ class FreeplayState extends MusicBeatState
 			var cost:FlxText = new FlxText(
 				565,
 				238 + (i * 40),
+				0,
 				Std.string(goldenSpatulaCost[i])
 			);
 
@@ -220,8 +224,10 @@ class FreeplayState extends MusicBeatState
 
 			cost.antialiasing = true;
 
-			if (i >= 3
-				&& goldenSpatulaCost[2] <= FlxG.save.data.spat)
+			if (
+				i >= 3
+				&& goldenSpatulaCost[2] <= FlxG.save.data.spat
+			)
 			{
 				cost.y += 30;
 			}
@@ -232,6 +238,7 @@ class FreeplayState extends MusicBeatState
 		var shinyText:FlxText = new FlxText(
 			FlxG.width * 0.765,
 			5,
+			0,
 			"Shiny Count"
 		);
 
@@ -304,10 +311,15 @@ class FreeplayState extends MusicBeatState
 		changeSelection();
 		changeDiff();
 
-		selector = new FlxText();
+		selector = new FlxText(
+			0,
+			0,
+			0,
+			">"
+		);
 
 		selector.size = 40;
-		selector.text = ">";
+		add(selector);
 
 		bubbles = new FlxTypedGroup<FlxEmitter>();
 
@@ -413,8 +425,7 @@ class FreeplayState extends MusicBeatState
 		{
 			var bubble:FlxSprite = new FlxSprite(
 				-10 + (35 * i),
-				740
-					+ (FlxG.random.int(10, 70) * i)
+				740 + (FlxG.random.int(10, 70) * i)
 					+ ((i >= 20) ? -100 : 0)
 			);
 
@@ -425,7 +436,7 @@ class FreeplayState extends MusicBeatState
 			bubble.setGraphicSize(
 				Std.int(
 					bubble.width
-						* FlxG.random.float(0.7, 1.1)
+					* FlxG.random.float(0.7, 1.1)
 				)
 			);
 
@@ -436,6 +447,7 @@ class FreeplayState extends MusicBeatState
 		loading = new FlxText(
 			FlxG.width * 0.868,
 			FlxG.height - 42,
+			0,
 			"LOADING....."
 		);
 
@@ -465,7 +477,7 @@ class FreeplayState extends MusicBeatState
 		songColor:FlxColor
 	)
 	{
-		var coolDifficultyArray = [];
+		var coolDifficultyArray:Array<String> = [];
 
 		for (i in CoolUtil.difficultyArray)
 		{
@@ -505,12 +517,15 @@ class FreeplayState extends MusicBeatState
 			existingDifficulties.push(
 				coolDifficultyArray
 			);
+
+			trace(
+				'FREEPLAY: carregou ' + songName
+			);
 		}
 		else
 		{
 			trace(
-				'ERRO: nenhuma dificuldade encontrada para a música: '
-				+ songName
+				'FREEPLAY: NÃO encontrou JSON para ' + songName
 			);
 		}
 	}
@@ -565,7 +580,7 @@ class FreeplayState extends MusicBeatState
 	{
 		super.update(elapsed);
 
-		var lerpVal = Main.framerateAdjust(0.1);
+		var lerpVal:Float = Main.framerateAdjust(0.1);
 
 		lerpScore = Math.floor(
 			FlxMath.lerp(
@@ -581,9 +596,9 @@ class FreeplayState extends MusicBeatState
 		if (squeakSound > 2)
 			squeakSound = 1;
 
-		var upP = controls.UP_P;
-		var downP = controls.DOWN_P;
-		var accepted = controls.ACCEPT;
+		var upP:Bool = controls.UP_P;
+		var downP:Bool = controls.DOWN_P;
+		var accepted:Bool = controls.ACCEPT;
 
 		if (upP && !selectedSong)
 		{
@@ -617,10 +632,13 @@ class FreeplayState extends MusicBeatState
 		if (controls.BACK && !selectedSong)
 		{
 			threadActive = false;
+
 			Main.switchState(
 				this,
 				new TitleState()
 			);
+
+			return;
 		}
 
 		if (
@@ -629,7 +647,6 @@ class FreeplayState extends MusicBeatState
 			&& curSelected >= 0
 			&& curSelected < songs.length
 			&& curSelected < goldenSpatulaCost.length
-			&& FlxG.save.data.spat != null
 			&& goldenSpatulaCost[curSelected]
 				<= FlxG.save.data.spat
 		)
@@ -654,36 +671,7 @@ class FreeplayState extends MusicBeatState
 			(signs.x - 185)
 			+ (signs.width / 2)
 			- (diffText.width / 2);
-
-		mutex.acquire();
-
-		if (songToPlay != null)
-		{
-			FlxG.sound.playMusic(songToPlay);
-
-			if (FlxG.sound.music.fadeTween != null)
-				FlxG.sound.music.fadeTween.cancel();
-
-			FlxG.sound.music.volume = 0.0;
-
-			FlxG.sound.music.fadeIn(
-				1.0,
-				0.0,
-				1.0
-			);
-
-			songToPlay = null;
-		}
-
-		mutex.release();
 	}
-
-	override function beatHit()
-	{
-		super.beatHit();
-	}
-
-	var lastDifficulty:String;
 
 	function changeDiff(change:Int = 0)
 	{
@@ -697,8 +685,7 @@ class FreeplayState extends MusicBeatState
 			return;
 
 		if (
-			existingDifficulties == null
-			|| curSelected >= existingDifficulties.length
+			curSelected >= existingDifficulties.length
 		)
 			return;
 
@@ -724,44 +711,6 @@ class FreeplayState extends MusicBeatState
 			curDifficulty = 0;
 		}
 
-		if (lastDifficulty != null && change != 0)
-		{
-			var safety:Int = 0;
-
-			while (
-				existingDifficulties[curSelected][curDifficulty]
-					== lastDifficulty
-				&& safety
-					< existingDifficulties[curSelected].length
-			)
-			{
-				curDifficulty += change;
-
-				if (curDifficulty < 0)
-				{
-					curDifficulty =
-						existingDifficulties[curSelected].length - 1;
-				}
-
-				if (
-					curDifficulty
-					>= existingDifficulties[curSelected].length
-				)
-				{
-					curDifficulty = 0;
-				}
-
-				safety++;
-			}
-		}
-
-		if (
-			curDifficulty < 0
-			|| curDifficulty
-				>= existingDifficulties[curSelected].length
-		)
-			return;
-
 		intendedScore = Highscore.getScore(
 			songs[curSelected].songName,
 			curDifficulty
@@ -771,9 +720,6 @@ class FreeplayState extends MusicBeatState
 			'< '
 			+ existingDifficulties[curSelected][curDifficulty]
 			+ ' >';
-
-		lastDifficulty =
-			existingDifficulties[curSelected][curDifficulty];
 	}
 
 	function changeSelection(change:Int = 0)
@@ -781,40 +727,11 @@ class FreeplayState extends MusicBeatState
 		if (songs == null || songs.length == 0)
 		{
 			trace(
-				'ERRO: nenhuma música foi carregada no Freeplay!'
+				'FREEPLAY: nenhuma música carregada!'
 			);
 
 			return;
 		}
-
-		trace('================================');
-		trace(
-			'MUSICAS CARREGADAS: '
-			+ songs.length
-		);
-
-		for (i in 0...songs.length)
-		{
-			if (songs[i] != null)
-			{
-				trace(
-					'SONG ['
-					+ i
-					+ ']: '
-					+ songs[i].songName
-				);
-			}
-			else
-			{
-				trace(
-					'SONG ['
-					+ i
-					+ ']: NULL'
-				);
-			}
-		}
-
-		trace('================================');
 
 		curSelected += change;
 
@@ -831,41 +748,14 @@ class FreeplayState extends MusicBeatState
 			return;
 
 		if (songs[curSelected] == null)
-		{
-			trace(
-				'ERRO: songs['
-				+ curSelected
-				+ '] está NULL!'
-			);
-
 			return;
-		}
 
 		if (
-			existingDifficulties == null
-			|| curSelected >= existingDifficulties.length
-		)
-		{
-			trace(
-				'ERRO: não existem dificuldades para a música '
-				+ songs[curSelected].songName
-			);
-
-			return;
-		}
-
-		if (
-			existingDifficulties[curSelected] == null
+			curSelected >= existingDifficulties.length
+			|| existingDifficulties[curSelected] == null
 			|| existingDifficulties[curSelected].length == 0
 		)
-		{
-			trace(
-				'ERRO: lista de dificuldades vazia para '
-				+ songs[curSelected].songName
-			);
-
 			return;
-		}
 
 		intendedScore = Highscore.getScore(
 			songs[curSelected].songName,
@@ -889,8 +779,6 @@ class FreeplayState extends MusicBeatState
 
 		changeDiff();
 	}
-
-	var playingSongs:Array<FlxSound> = [];
 
 	function transition()
 	{
@@ -930,7 +818,7 @@ class FreeplayState extends MusicBeatState
 				FlxTween.tween(
 					spr,
 					{y: -100},
-					FlxG.random.float(0.8, 1.4),
+					1,
 					{ease: FlxEase.sineIn}
 				);
 			}
@@ -942,15 +830,18 @@ class FreeplayState extends MusicBeatState
 			{
 				loading.visible = true;
 
-				var poop:String = Highscore.formatSong(
-					songs[curSelected].songName.toLowerCase(),
+				var difficultyIndex:Int =
 					CoolUtil.difficultyArray.indexOf(
 						existingDifficulties[
 							curSelected
 						][
 							curDifficulty
 						]
-					)
+					);
+
+				var poop:String = Highscore.formatSong(
+					songs[curSelected].songName.toLowerCase(),
+					difficultyIndex
 				);
 
 				PlayState.SONG = Song.loadFromJson(
@@ -961,7 +852,7 @@ class FreeplayState extends MusicBeatState
 				if (PlayState.SONG == null)
 				{
 					trace(
-						'ERRO: Song.loadFromJson retornou NULL para '
+						'FREEPLAY: erro ao carregar '
 						+ songs[curSelected].songName
 					);
 
