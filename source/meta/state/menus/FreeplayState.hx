@@ -591,13 +591,14 @@ class FreeplayState extends MusicBeatState
 		var lerpVal:Float =
 			Main.framerateAdjust(0.1);
 
-		lerpScore = Std.int(
+		var newScore:Float =
 			FlxMath.lerp(
 				lerpScore,
 				intendedScore,
 				lerpVal
-			)
-		);
+			);
+
+		lerpScore = Std.int(newScore);
 
 		if (
 			Math.abs(
@@ -690,23 +691,27 @@ class FreeplayState extends MusicBeatState
 		scoreText.text =
 			Std.string(lerpScore);
 
-		scoreText.x = Std.int(
+		var scoreX:Int = Std.int(
 			FlxG.width
 			- scoreText.width
 			- 5
 		);
 
-		shinies.x = Std.int(
+		var shiniesX:Int = Std.int(
 			(FlxG.width * 0.930)
 			- scoreText.width
 			- 5
 		);
 
-		diffText.x = Std.int(
+		var diffX:Int = Std.int(
 			(signs.x - 185)
 			+ (signs.width / 2)
 			- (diffText.width / 2)
 		);
+
+		scoreText.x = scoreX;
+		shinies.x = shiniesX;
+		diffText.x = diffX;
 	}
 
 	function changeDiff(change:Int = 0)
@@ -914,60 +919,3 @@ class FreeplayState extends MusicBeatState
 
 				PlayState.SONG =
 					Song.loadFromJson(
-						poop,
-						songs[
-							curSelected
-						].songName.toLowerCase()
-					);
-
-				if (PlayState.SONG == null)
-				{
-					selectedSong = false;
-					loading.visible = false;
-					return;
-				}
-
-				PlayState.isStoryMode = false;
-
-				PlayState.storyDifficulty =
-					curDifficulty;
-
-				PlayState.storyWeek =
-					songs[curSelected].week;
-
-				if (FlxG.sound.music != null)
-					FlxG.sound.music.stop();
-
-				threadActive = false;
-
-				FlxG.save.data.speedStore = true;
-
-				Main.switchState(
-					this,
-					new PlayState()
-				);
-			}
-		);
-	}
-}
-
-class SongMetadata
-{
-	public var songName:String = "";
-	public var week:Int = 0;
-	public var songCharacter:String = "";
-	public var songColor:FlxColor = FlxColor.WHITE;
-
-	public function new(
-		song:String,
-		week:Int,
-		songCharacter:String,
-		songColor:FlxColor
-	)
-	{
-		this.songName = song;
-		this.week = week;
-		this.songCharacter = songCharacter;
-		this.songColor = songColor;
-	}
-}
