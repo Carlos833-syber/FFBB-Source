@@ -252,7 +252,7 @@ class FreeplayState extends MusicBeatState
 		}
 
 		var shinyText:FlxText = new FlxText(
-			FlxG.width * 0.765,
+			Std.int(FlxG.width * 0.765),
 			5,
 			0,
 			"Shiny Count"
@@ -271,7 +271,7 @@ class FreeplayState extends MusicBeatState
 		add(shinyText);
 
 		scoreText = new FlxText(
-			FlxG.width * 0.7,
+			Std.int(FlxG.width * 0.7),
 			65,
 			0,
 			""
@@ -291,7 +291,7 @@ class FreeplayState extends MusicBeatState
 
 		shinies = new FlxSprite(
 			0,
-			scoreText.getGraphicMidpoint().y - 30
+			Std.int(scoreText.getGraphicMidpoint().y - 30)
 		).loadGraphic(
 			Paths.image("UI/default/base/shinies")
 		);
@@ -305,7 +305,7 @@ class FreeplayState extends MusicBeatState
 
 		diffText = new FlxText(
 			0,
-			signs.y + 868,
+			Std.int(signs.y + 868),
 			0,
 			""
 		);
@@ -440,9 +440,12 @@ class FreeplayState extends MusicBeatState
 		for (i in 0...40)
 		{
 			var bubble:FlxSprite = new FlxSprite(
-				-10 + (35 * i),
-				740 + (FlxG.random.int(10, 70) * i)
+				Std.int(-10 + (35 * i)),
+				Std.int(
+					740
+					+ (FlxG.random.int(10, 70) * i)
 					+ ((i >= 20) ? -100 : 0)
+				)
 			);
 
 			bubble.loadGraphic(
@@ -461,8 +464,8 @@ class FreeplayState extends MusicBeatState
 		}
 
 		loading = new FlxText(
-			FlxG.width * 0.868,
-			FlxG.height - 42,
+			Std.int(FlxG.width * 0.868),
+			Std.int(FlxG.height - 42),
 			0,
 			"LOADING....."
 		);
