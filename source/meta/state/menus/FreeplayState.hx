@@ -1,24 +1,36 @@
 package meta.state.menus;
 
+import flash.text.TextField;
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.FlxSubState;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.effects.particles.FlxEmitter;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
+import flixel.math.FlxRandom;
+import flixel.system.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
+import flixel.tweens.misc.ColorTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
+import gameObjects.userInterface.HealthIcon;
 import gameObjects.userInterface.SpatulaHUD;
 import lime.utils.Assets;
 import meta.MusicBeat.MusicBeatState;
-import meta.data.Song;
-import meta.subState.GameOverSubstate;
-import meta.subState.PlayState;
+import meta.data.*;
+import meta.data.Song.SwagSong;
+import meta.data.dependency.Discord;
+import meta.subState.*;
+import openfl.media.Sound;
+import openfl.utils.Assets as OpenFlAssets;
+import sys.FileSystem;
 import sys.thread.Mutex;
 import sys.thread.Thread;
+
+using StringTools;
 
 class FreeplayState extends MusicBeatState
 {
@@ -38,7 +50,7 @@ class FreeplayState extends MusicBeatState
 	var songThread:Thread;
 	var threadActive:Bool = true;
 	var mutex:Mutex;
-	var songToPlay:Dynamic = null;
+	var songToPlay:Sound = null;
 
 	var transitionBG:FlxSprite;
 	var shinies:FlxSprite;
@@ -112,10 +124,18 @@ class FreeplayState extends MusicBeatState
 			}
 		}
 
+		#if !android
+		Discord.changePresence(
+			'Ordering A Battle',
+			'Freeplay',
+			" ",
+			TitleState.titleImage
+		);
+		#end
+
 		bgBack = new FlxSprite().loadGraphic(
 			Paths.image('menus/base/freeplay/bgBack')
 		);
-
 		bgBack.antialiasing = true;
 		add(bgBack);
 
@@ -125,14 +145,12 @@ class FreeplayState extends MusicBeatState
 		).loadGraphic(
 			Paths.image('menus/base/freeplay/thereIAm')
 		);
-
 		thereIAm.antialiasing = true;
 		add(thereIAm);
 
 		bg = new FlxSprite().loadGraphic(
 			Paths.image('menus/base/freeplay/bg')
 		);
-
 		bg.antialiasing = true;
 		add(bg);
 
@@ -142,7 +160,6 @@ class FreeplayState extends MusicBeatState
 		).loadGraphic(
 			Paths.image('menus/base/freeplay/signs')
 		);
-
 		signs.antialiasing = true;
 		add(signs);
 
@@ -196,7 +213,6 @@ class FreeplayState extends MusicBeatState
 
 			if (
 				i >= 3
-				&& goldenSpatulaCost.length > 2
 				&& goldenSpatulaCost[2] <= FlxG.save.data.spat
 			)
 			{
@@ -519,13 +535,14 @@ class FreeplayState extends MusicBeatState
 			);
 
 			trace(
-				'FREEPLAY: carregou ' + songName
+				"FREEPLAY: carregou " + songName
 			);
 		}
 		else
 		{
 			trace(
-				'FREEPLAY: NÃO encontrou JSON para ' + songName
+				"FREEPLAY: NÃO encontrou JSON para "
+				+ songName
 			);
 		}
 	}
@@ -547,19 +564,21 @@ class FreeplayState extends MusicBeatState
 
 		for (song in songs)
 		{
-			var character:String = songCharacters[
-				Math.min(
-					num[0],
-					songCharacters.length - 1
-				)
-			];
+			var character:String =
+				songCharacters[
+					Math.min(
+						num[0],
+						songCharacters.length - 1
+					)
+				];
 
-			var color:FlxColor = songColor[
-				Math.min(
-					num[1],
-					songColor.length - 1
-				)
-			];
+			var color:FlxColor =
+				songColor[
+					Math.min(
+						num[1],
+						songColor.length - 1
+					)
+				];
 
 			addSong(
 				song,
@@ -580,7 +599,8 @@ class FreeplayState extends MusicBeatState
 	{
 		super.update(elapsed);
 
-		var lerpVal:Float = Main.framerateAdjust(0.1);
+		var lerpVal:Float =
+			Main.framerateAdjust(0.1);
 
 		lerpScore = Math.floor(
 			FlxMath.lerp(
@@ -590,8 +610,14 @@ class FreeplayState extends MusicBeatState
 			)
 		);
 
-		if (Math.abs(lerpScore - intendedScore) <= 10)
+		if (
+			Math.abs(
+				lerpScore - intendedScore
+			) <= 10
+		)
+		{
 			lerpScore = intendedScore;
+		}
 
 		if (squeakSound > 2)
 			squeakSound = 1;
@@ -605,7 +631,9 @@ class FreeplayState extends MusicBeatState
 			changeSelection(-1);
 
 			FlxG.sound.play(
-				Paths.sound('squeak' + squeakSound),
+				Paths.sound(
+					'squeak' + squeakSound
+				),
 				0.7
 			);
 
@@ -616,20 +644,35 @@ class FreeplayState extends MusicBeatState
 			changeSelection(1);
 
 			FlxG.sound.play(
-				Paths.sound('squeak' + squeakSound),
+				Paths.sound(
+					'squeak' + squeakSound
+				),
 				0.7
 			);
 
 			squeakSound++;
 		}
 
-		if (controls.LEFT_P && !selectedSong)
+		if (
+			controls.LEFT_P
+			&& !selectedSong
+		)
+		{
 			changeDiff(-1);
+		}
 
-		if (controls.RIGHT_P && !selectedSong)
+		if (
+			controls.RIGHT_P
+			&& !selectedSong
+		)
+		{
 			changeDiff(1);
+		}
 
-		if (controls.BACK && !selectedSong)
+		if (
+			controls.BACK
+			&& !selectedSong
+		)
 		{
 			threadActive = false;
 
@@ -655,7 +698,8 @@ class FreeplayState extends MusicBeatState
 			transition();
 		}
 
-		scoreText.text = Std.string(lerpScore);
+		scoreText.text =
+			Std.string(lerpScore);
 
 		scoreText.x =
 			FlxG.width
@@ -675,7 +719,10 @@ class FreeplayState extends MusicBeatState
 
 	function changeDiff(change:Int = 0)
 	{
-		if (songs == null || songs.length == 0)
+		if (
+			songs == null
+			|| songs.length == 0
+		)
 			return;
 
 		if (
@@ -685,7 +732,8 @@ class FreeplayState extends MusicBeatState
 			return;
 
 		if (
-			curSelected >= existingDifficulties.length
+			curSelected
+			>= existingDifficulties.length
 		)
 			return;
 
@@ -700,34 +748,46 @@ class FreeplayState extends MusicBeatState
 		if (curDifficulty < 0)
 		{
 			curDifficulty =
-				existingDifficulties[curSelected].length - 1;
+				existingDifficulties[
+					curSelected
+				].length - 1;
 		}
 
 		if (
 			curDifficulty
-			>= existingDifficulties[curSelected].length
+			>= existingDifficulties[
+				curSelected
+			].length
 		)
 		{
 			curDifficulty = 0;
 		}
 
-		intendedScore = Highscore.getScore(
-			songs[curSelected].songName,
-			curDifficulty
-		);
+		intendedScore =
+			Highscore.getScore(
+				songs[curSelected].songName,
+				curDifficulty
+			);
 
 		diffText.text =
 			'< '
-			+ existingDifficulties[curSelected][curDifficulty]
+			+ existingDifficulties[
+				curSelected
+			][
+				curDifficulty
+			]
 			+ ' >';
 	}
 
 	function changeSelection(change:Int = 0)
 	{
-		if (songs == null || songs.length == 0)
+		if (
+			songs == null
+			|| songs.length == 0
+		)
 		{
 			trace(
-				'FREEPLAY: nenhuma música carregada!'
+				"FREEPLAY: nenhuma música carregada!"
 			);
 
 			return;
@@ -751,18 +811,25 @@ class FreeplayState extends MusicBeatState
 			return;
 
 		if (
-			curSelected >= existingDifficulties.length
-			|| existingDifficulties[curSelected] == null
+			curSelected
+			>= existingDifficulties.length
+		)
+			return;
+
+		if (
+			existingDifficulties[curSelected] == null
 			|| existingDifficulties[curSelected].length == 0
 		)
 			return;
 
-		intendedScore = Highscore.getScore(
-			songs[curSelected].songName,
-			curDifficulty
-		);
+		intendedScore =
+			Highscore.getScore(
+				songs[curSelected].songName,
+				curDifficulty
+			);
 
-		mainColor = songs[curSelected].songColor;
+		mainColor =
+			songs[curSelected].songColor;
 
 		grpOrders.forEach(
 			function(txt:FlxText)
@@ -782,7 +849,10 @@ class FreeplayState extends MusicBeatState
 
 	function transition()
 	{
-		if (songs == null || songs.length == 0)
+		if (
+			songs == null
+			|| songs.length == 0
+		)
 			return;
 
 		if (
@@ -792,8 +862,13 @@ class FreeplayState extends MusicBeatState
 			return;
 
 		if (
-			curSelected >= existingDifficulties.length
-			|| existingDifficulties[curSelected] == null
+			curSelected
+			>= existingDifficulties.length
+		)
+			return;
+
+		if (
+			existingDifficulties[curSelected] == null
 			|| existingDifficulties[curSelected].length == 0
 		)
 			return;
@@ -801,7 +876,9 @@ class FreeplayState extends MusicBeatState
 		if (
 			curDifficulty < 0
 			|| curDifficulty
-				>= existingDifficulties[curSelected].length
+				>= existingDifficulties[
+					curSelected
+				].length
 		)
 			return;
 
@@ -819,7 +896,9 @@ class FreeplayState extends MusicBeatState
 					spr,
 					{y: -100},
 					1,
-					{ease: FlxEase.sineIn}
+					{
+						ease: FlxEase.sineIn
+					}
 				);
 			}
 		);
@@ -839,21 +918,45 @@ class FreeplayState extends MusicBeatState
 						]
 					);
 
-				var poop:String = Highscore.formatSong(
-					songs[curSelected].songName.toLowerCase(),
-					difficultyIndex
+				var poop:String =
+					Highscore.formatSong(
+						songs[
+							curSelected
+						].songName.toLowerCase(),
+						difficultyIndex
+					);
+
+				trace(
+					"FREEPLAY: carregando "
+					+ songs[curSelected].songName
 				);
 
-				PlayState.SONG = Song.loadFromJson(
-					poop,
-					songs[curSelected].songName.toLowerCase()
+				trace(
+					"FREEPLAY: dificuldade = "
+					+ existingDifficulties[
+						curSelected
+					][
+						curDifficulty
+					]
 				);
+
+				trace(
+					"FREEPLAY: formatSong = "
+					+ poop
+				);
+
+				PlayState.SONG =
+					Song.loadFromJson(
+						poop,
+						songs[
+							curSelected
+						].songName.toLowerCase()
+					);
 
 				if (PlayState.SONG == null)
 				{
 					trace(
-						'FREEPLAY: erro ao carregar '
-						+ songs[curSelected].songName
+						"FREEPLAY: Song retornou NULL!"
 					);
 
 					selectedSong = false;
