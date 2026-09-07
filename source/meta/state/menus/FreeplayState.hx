@@ -35,7 +35,6 @@ using StringTools;
 class FreeplayState extends MusicBeatState
 {
 	var songs:Array<SongMetadata> = [];
-
 	var selector:FlxText;
 
 	public static var curSelected:Int = 0;
@@ -64,7 +63,6 @@ class FreeplayState extends MusicBeatState
 	var bubbleEffect:FlxTypedGroup<FlxSprite>;
 
 	private var curPlaying:Bool = false;
-
 	private var labels:FlxText;
 
 	private var galleyGrubOrders:Array<String> = [
@@ -86,7 +84,6 @@ class FreeplayState extends MusicBeatState
 	];
 
 	private var grpOrders:FlxTypedGroup<FlxText>;
-
 	private var mainColor:FlxColor = FlxColor.WHITE;
 
 	private var bgBack:FlxSprite;
@@ -104,7 +101,6 @@ class FreeplayState extends MusicBeatState
 		super.create();
 
 		mutex = new Mutex();
-
 		GameOverSubstate.fishHadEnough = 0;
 
 		for (i in 0...Main.gameWeeks.length)
@@ -536,17 +532,6 @@ class FreeplayState extends MusicBeatState
 			existingDifficulties.push(
 				coolDifficultyArray
 			);
-
-			trace(
-				"FREEPLAY: carregou " + songName
-			);
-		}
-		else
-		{
-			trace(
-				"FREEPLAY: NÃO encontrou JSON para "
-				+ songName
-			);
 		}
 	}
 
@@ -704,10 +689,11 @@ class FreeplayState extends MusicBeatState
 		scoreText.text =
 			Std.string(lerpScore);
 
-		scoreText.x =
+		scoreText.x = Std.int(
 			FlxG.width
 			- scoreText.width
-			- 5;
+			- 5
+		);
 
 		shinies.x = Std.int(
 			(FlxG.width * 0.930)
@@ -790,13 +776,7 @@ class FreeplayState extends MusicBeatState
 			songs == null
 			|| songs.length == 0
 		)
-		{
-			trace(
-				"FREEPLAY: nenhuma música carregada!"
-			);
-
 			return;
-		}
 
 		curSelected += change;
 
@@ -931,25 +911,6 @@ class FreeplayState extends MusicBeatState
 						difficultyIndex
 					);
 
-				trace(
-					"FREEPLAY: carregando "
-					+ songs[curSelected].songName
-				);
-
-				trace(
-					"FREEPLAY: dificuldade = "
-					+ existingDifficulties[
-						curSelected
-					][
-						curDifficulty
-					]
-				);
-
-				trace(
-					"FREEPLAY: formatSong = "
-					+ poop
-				);
-
 				PlayState.SONG =
 					Song.loadFromJson(
 						poop,
@@ -960,13 +921,8 @@ class FreeplayState extends MusicBeatState
 
 				if (PlayState.SONG == null)
 				{
-					trace(
-						"FREEPLAY: Song retornou NULL!"
-					);
-
 					selectedSong = false;
 					loading.visible = false;
-
 					return;
 				}
 
