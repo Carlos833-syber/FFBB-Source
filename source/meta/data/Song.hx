@@ -43,18 +43,68 @@ class Song
 
 	public static function loadFromJson(jsonInput:String, ?folder:String):SwagSong
 	{
-		var rawJson = OpenFlAssets.getText(Paths.songJson(folder.toLowerCase(), jsonInput.toLowerCase())).trim();
+		var realFolder:String = folder;
+		var realJson:String = jsonInput;
 
-		while (!rawJson.endsWith("}"))
-			rawJson = rawJson.substr(0, rawJson.length - 1);
+		/*
+		 * Nuts and Bolts usa nomes diferentes dos nomes
+		 * usados originalmente pela playlist.
+		 *
+		 * Caminho real:
+		 * assets/songs/Nuts-and-Bolts/
+		 *
+		 * Arquivos:
+		 * nuts-and-bolts.json
+		 * nuts-and-bolts-easy.json
+		 * nuts-and-bolts-hard.json
+		 */
+		if (
+			folder != null &&
+			folder.toLowerCase() == 'nuts and bolts'
+		)
+		{
+			realFolder = 'Nuts-and-Bolts';
+
+			realJson =
+				jsonInput
+					.toLowerCase()
+					.replace('nuts and bolts', 'nuts-and-bolts')
+					.replace(' ', '-');
+		}
+
+		var assetPath:String =
+			Paths.songJson(
+				realFolder,
+				realJson
+			);
+
+		var rawJson:String =
+			OpenFlAssets.getText(assetPath).trim();
+
+		while (
+			rawJson.length > 0 &&
+			!rawJson.endsWith("}")
+		)
+		{
+			rawJson =
+				rawJson.substr(
+					0,
+					rawJson.length - 1
+				);
+		}
 
 		return parseJSONshit(rawJson);
 	}
 
-	public static function parseJSONshit(rawJson:String):SwagSong
+	public static function parseJSONshit(
+		rawJson:String
+	):SwagSong
 	{
-		var swagShit:SwagSong = cast Json.parse(rawJson).song;
+		var swagShit:SwagSong =
+			cast Json.parse(rawJson).song;
+
 		swagShit.validScore = true;
+
 		return swagShit;
 	}
 }
